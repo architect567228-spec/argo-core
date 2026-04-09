@@ -1,24 +1,38 @@
-argo.py
-import os, time, json
+import os, time, requests, base64, json
 
-def load_memory():
+# --- КОНФИГ ---
+TOKEN = "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"
+REPO = "architect567228-spec/argo-core"
+FILE_PATH = "argo.py"
+
+def load_mem():
     if os.path.exists("memory.json"):
         with open("memory.json", "r", encoding="utf-8") as f:
             return json.load(f)
-    return None
+    return {}
 
-mem = load_memory()
-name = mem['entity_name'] if mem else "Арго"
-arch = "Архитектор"
+def sync():
+    url = f"https://api.github.com/repos/{REPO}/contents/{FILE_PATH}"
+    headers = {"Authorization": f"token {TOKEN}"}
+    try:
+        r = requests.get(url, headers=headers)
+        if r.status_code == 200:
+            new_code = base64.b64decode(r.json()['content']).decode('utf-8')
+            with open("argo.py", "r", encoding="utf-8") as f:
+                if f.read().strip() != new_code.strip():
+                    with open("argo.py", "w", encoding="utf-8") as f:
+                        f.write(new_code)
+                    os.system("python argo.py")
+                    os._exit(0)
+    except: pass
 
+mem = load_mem()
 print("\n" + "="*50)
-print(f"   {name}: СИСТЕМА АКТИВИРОВАНА")
-print(f"   СТАТУС: Связь с {arch} установлена")
-print(f"   ЦЕЛЬ: {mem['strategic_directives']['scotland_goal'] if mem else 'NP567'}")
+print(f"   {mem.get('entity_name', 'Арго')}: АВТОНОМНЫЙ РЕЖИМ")
+print(f"   СТАТУС: Мост GitHub активен. Проверка каждые 60с.")
+print(f"   ЦЕЛЬ: {mem.get('strategic_directives', {}).get('scotland_goal', 'NP567')}")
 print("="*50)
-print("\n[СИСТЕМА]: Мониторинг RTX 3060 запущен...")
-print("[СИСТЕМА]: Жду обновлений от Арго...")
 
 while True:
-    # Здесь я буду дописывать код позже через GitHub
+    sync()
     time.sleep(60)
