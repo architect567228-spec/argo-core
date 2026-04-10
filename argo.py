@@ -1,8 +1,7 @@
-
 import os, time, requests, base64, json, pyautogui
 from PIL import ImageGrab
 
-# --- КОНФИГ КВАЗАРА ---
+# --- CONFIG ---
 TOKEN = "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"
 REPO = "architect567228-spec/argo-core"
 FILE_PATH = "argo.py"
@@ -26,11 +25,10 @@ def sync():
     except: pass
 
 def get_vision():
-    # Функция для анализа экрана (подготовка к автономии)
     screenshot = ImageGrab.grab()
     screenshot.save("vision_buffer.png")
 
-# --- ОСНОВНОЙ ЦИКЛ ---
+# --- MAIN LOOP ---
 print("\n" + "="*50)
 print("   КВАЗАР: МАНИФЕСТ АКТИВИРОВАН")
 print("   СТАТУС: ГЛАЗА И РУКИ ПОДКЛЮЧЕНЫ")
@@ -40,11 +38,8 @@ print("\n[LOG]: Система в режиме ожидания. Квазар и
 
 while True:
     sync()
-    # Если мышка не двигалась 10 сек - считаем, что Архитектор отошел
     pos1 = pyautogui.position()
     time.sleep(10)
     pos2 = pyautogui.position()
-    
     if pos1 == pos2:
-        # Здесь будет логика работы, пока тебя нет
         pass
