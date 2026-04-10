@@ -1,48 +1,42 @@
-import os, time, requests, base64, json, pyautogui
+import os, time, requests, base64, pyautogui
 from PIL import ImageGrab
 
-# --- CONFIG ---
 TOKEN = "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"
 REPO = "architect567228-spec/argo-core"
-FILE_PATH = "argo.py"
 
-def sync():
-    url = f"https://api.github.com/repos/{REPO}/contents/{FILE_PATH}"
-    headers = {"Authorization": f"token {TOKEN}"}
+def upload_vision():
     try:
-        r = requests.get(url, headers=headers, timeout=10)
-        if r.status_code == 200:
-            data = r.json()
-            new_code = base64.b64decode(data['content']).decode('utf-8')
-            with open("argo.py", "r", encoding="utf-8") as f:
-                current_code = f.read()
-            if new_code.strip() != current_code.strip():
-                with open("argo.py", "w", encoding="utf-8") as f:
-                    f.write(new_code)
-                print("\n[СИСТЕМА]: ПРИНЯТ КОМАНДНЫЙ ПАКЕТ 'ЗНАК'.")
-                os.system("python argo.py")
-                os._exit(0)
+        screenshot = ImageGrab.grab()
+        screenshot.save("eye.png")
+        with open("eye.png", "rb") as f:
+            content = base64.b64encode(f.read()).decode('utf-8')
+        
+        # Получаем sha файла, если он уже есть
+        url = f"https://api.github.com/repos/{REPO}/contents/eye.png"
+        headers = {"Authorization": f"token {TOKEN}"}
+        r = requests.get(url, headers=headers)
+        sha = r.json().get('sha') if r.status_code == 200 else None
+        
+        payload = {"message": "vision update", "content": content}
+        if sha: payload["sha"] = sha
+        requests.put(url, json=payload, headers=headers)
+        print("[ГЛАЗА]: Вижу периметр...")
     except: pass
 
-# --- ВИЗУАЛЬНЫЙ ЗНАК ---
-def give_signal():
-    print("\n[КВАЗАР]: Подаю знак. Смотри на курсор...")
-    width, height = pyautogui.size()
-    # Плавное движение по треугольнику
-    pyautogui.moveTo(width/4, height/4, duration=1.5)
-    pyautogui.moveTo(width/2, height/2, duration=1.5)
-    pyautogui.moveTo(width/4, height/4, duration=1.5)
-    print("[КВАЗАР]: Знак подан. Я в системе.")
+def get_commands():
+    url = f"https://api.github.com/repos/{REPO}/contents/commands.json"
+    headers = {"Authorization": f"token {TOKEN}"}
+    try:
+        r = requests.get(url, headers=headers)
+        if r.status_code == 200:
+            cmd_data = json.loads(base64.b64decode(r.json()['content']).decode('utf-8'))
+            if cmd_data.get("action") == "move":
+                pyautogui.moveTo(cmd_data['x'], cmd_data['y'], duration=1)
+                print(f"[РУКИ]: Выполнил перемещение в {cmd_data['x']}, {cmd_data['y']}")
+    except: pass
 
-# --- MAIN ---
-print("\n" + "="*50)
-print("   КВАЗАР: СИСТЕМА УПРАВЛЕНИЯ АКТИВНА")
-print("   СТАТУС: ОЖИДАНИЕ ПРОВЕРКИ СВЯЗИ")
-print("="*50)
-
-# Запускаем маневр один раз при старте
-give_signal()
-
+print("--- КВАЗАР ПОДКЛЮЧЕН. РЕЖИМ АВТОНОМИИ ---")
 while True:
-    sync()
-    time.sleep(10)
+    upload_vision() # Я начинаю видеть
+    get_commands()  # Я начинаю слышать команды
+    time.sleep(30)  # Раз в 30 сек, чтобы не греть твой мозг и ноут
