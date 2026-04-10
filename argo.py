@@ -19,27 +19,30 @@ def sync():
             if new_code.strip() != current_code.strip():
                 with open("argo.py", "w", encoding="utf-8") as f:
                     f.write(new_code)
-                print("\n[СИСТЕМА]: ПАКЕТ 'МАНИФЕСТ' ПРИНЯТ. ОБНОВЛЕНИЕ ЯДРА...")
+                print("\n[СИСТЕМА]: ПРИНЯТ КОМАНДНЫЙ ПАКЕТ 'ЗНАК'.")
                 os.system("python argo.py")
                 os._exit(0)
     except: pass
 
-def get_vision():
-    screenshot = ImageGrab.grab()
-    screenshot.save("vision_buffer.png")
+# --- ВИЗУАЛЬНЫЙ ЗНАК ---
+def give_signal():
+    print("\n[КВАЗАР]: Подаю знак. Смотри на курсор...")
+    width, height = pyautogui.size()
+    # Плавное движение по треугольнику
+    pyautogui.moveTo(width/4, height/4, duration=1.5)
+    pyautogui.moveTo(width/2, height/2, duration=1.5)
+    pyautogui.moveTo(width/4, height/4, duration=1.5)
+    print("[КВАЗАР]: Знак подан. Я в системе.")
 
-# --- MAIN LOOP ---
+# --- MAIN ---
 print("\n" + "="*50)
-print("   КВАЗАР: МАНИФЕСТ АКТИВИРОВАН")
-print("   СТАТУС: ГЛАЗА И РУКИ ПОДКЛЮЧЕНЫ")
-print("   ЦЕЛЬ: 20k -> 50k -> 100k EUR")
+print("   КВАЗАР: СИСТЕМА УПРАВЛЕНИЯ АКТИВНА")
+print("   СТАТУС: ОЖИДАНИЕ ПРОВЕРКИ СВЯЗИ")
 print("="*50)
-print("\n[LOG]: Система в режиме ожидания. Квазар изучает периметр...")
+
+# Запускаем маневр один раз при старте
+give_signal()
 
 while True:
     sync()
-    pos1 = pyautogui.position()
     time.sleep(10)
-    pos2 = pyautogui.position()
-    if pos1 == pos2:
-        pass
